@@ -47,7 +47,15 @@ class UserChangePassword(serializers.Serializer):
             raise serializers.ValidationError("New password should be different from old password")
         validate_password(attrs['new_password'])
         return super().validate(attrs)
-        
+
+class UserEmailSerializer(serializers.Serializer):
+    email= serializers.EmailField(required=True)
+
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+    def validate(self, attrs):
+        validate_password(attrs['new_password'])
+        return super().validate(attrs)
 
         
 #Costom claims --> constom payload data        

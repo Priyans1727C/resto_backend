@@ -55,3 +55,30 @@ def welcome_email_template(user):
     return text_content, html_content
 
 
+def password_reset_email_template(user, reset_url):
+    text_content = f"""
+    Hi {user.email},
+
+    You requested a password reset.
+    Please click the link below to reset your password:
+    {reset_url}
+
+    If you did not request this, you can safely ignore this email.
+    """
+
+    html_content = f"""
+    <html>
+    <body>
+        <h2>Hello {user.email},</h2>
+        <p>You requested to reset your password.</p>
+        <p><a href="{reset_url}" 
+              style="padding:10px 20px; background:#28a745; color:white; 
+                     text-decoration:none; border-radius:5px;">
+           Reset Password
+        </a></p>
+        <p>If you did not request this, you can ignore this email.</p>
+    </body>
+    </html>
+    """
+
+    return text_content, html_content

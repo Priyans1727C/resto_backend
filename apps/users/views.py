@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework import status
-from .serializers import UserSafeSerializer,UpdateUserSerializer,UserRegisterSerializer,RoleTokenObtainPairSerializer,UserChangePassword
+from .serializers import UserSafeSerializer,UpdateUserSerializer,UserRegisterSerializer,RoleTokenObtainPairSerializer,UserChangePassword,UserEmailSerializer,ResetPasswordSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -58,12 +58,12 @@ class VerifyEmailView(APIView):
             uid = urlsafe_base64_decode(uidb64)
             user = User.objects.get(pk=uid)
         except Exception:
-            return Response({"detail":"Invalid or expired link"})
+            return Response({"detail":"Invalid or expired link"},status=status.HTTP_400_BAD_REQUEST)
 
         if VerificationService.activate_user(user,token):
              return Response({"Email verified successfully!"})
         
-        return Response({"detail":"Invalid or expired link"})
+        return Response({"detail":"Invalid or expired link"},status=status.HTTP_400_BAD_REQUEST)
 """
 #basic session base login
 
@@ -81,6 +81,37 @@ class UserLoginView(APIView):
             return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
             
 """
+
+class ForgotPasswordView(APIView):
+    serializer_class=UserEmailSerializer 
+    def post(self,request,*args, **kwargs):
+        ser = self.serializer_class(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            user = User.objects.get(email=ser.validated_data['email'])
+            VerificationService.send_verification_password_email(request,user)
+        except Exception as e:
+            pass
+        return Response({"detail": "If this email exists, a reset link has been sent."})
+
+class ResetPasswordView(APIView):
+    def post(self,request,uidb64,token, **kwargs):
+        ser = ResetPasswordSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            uid = urlsafe_base64_decode(uidb64)
+            user = User.objects.get(pk=uid)
+        except Exception:
+            return Response({"detail":"Invalid or expired link"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if VerificationService.verify_token(user,token):
+            user.set_password(ser.validated_data["new_password"])
+            user.save(update_fields = ["password"])
+            return Response({"detail":"Password changed"},status=200)
+
+        return Response({"detail":"Invalid or expired link"}, status=status.HTTP_400_BAD_REQUEST)
+    
+        
 
 class AccessTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
