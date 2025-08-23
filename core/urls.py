@@ -21,6 +21,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +31,4 @@ urlpatterns = [
 
     path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
     
-]
+] + debug_toolbar_urls()

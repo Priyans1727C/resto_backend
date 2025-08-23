@@ -25,6 +25,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     # Add packages like 'rest_framework' here
+    # "django.contrib.staticfiles",
+    "debug_toolbar",
 ]
 
 LOCAL_APPS = [
@@ -53,6 +55,9 @@ DEFAULT_MIDDLEWARES = [
 ]
 
 AUTH_MIDDLEWARES = [
+    #debuger
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    
     "corsheaders.middleware.CorsMiddleware"
 ]
 
@@ -132,9 +137,34 @@ AUTH_USER_MODEL = "users.User"
 # REST_FRAMEWORK
 # -------------------------
 REST_FRAMEWORK = {
+    # == Authentication ==
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+
+    # == Permissions ==
+    #
+    #
+    
+    # == Throttling ==
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',  
+        'rest_framework.throttling.ScopedRateThrottle', 
+        'apps.users.throttling.BurstRateThrottle',
+        'apps.users.throttling.SustainedRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        "anon": "100/min",
+        "burst":"200/min",
+        "sustained":"500/day",
+        "change_password":"10/hour",
+        "register":"6/hour",
+        "verify_email":"2/hour",
+        "forgot_password":"3/hour",
+        "verify_reset_password":"3/hour",
+        "login":"4/minute",
+        # "login_sustained":"10/hour",
+    },
 }
 
 
@@ -163,3 +193,23 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 EMAIL_TOKEN_RESET_TIMEOUT= 120
+
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # This location points to your Docker container
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

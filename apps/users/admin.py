@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import User,UserProfile
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -15,3 +15,11 @@ class UserAdmin(BaseUserAdmin):
     )
     add_fieldsets = ((None, {"classes": ("wide",), "fields": ("email","password1","password2")}),)
     search_fields = ("email", "full_name")
+
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "first_name", "last_name", "phone_number", "date_of_birth")
+    search_fields = ("user__username", "first_name", "last_name", "phone_number")
+    list_filter = ("date_of_birth",)
