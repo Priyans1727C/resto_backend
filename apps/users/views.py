@@ -19,6 +19,7 @@ from django.utils.http import urlsafe_base64_decode
 
 from .throttling import (LoginBurstThrottle, LoginSustainedThrottle)
 # Create your views here.
+from .tasks import send_verification_email,send_verification_password_email
 
 User = get_user_model()
 
@@ -54,7 +55,8 @@ class UserRegisterView(APIView):
         ser = UserRegisterSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         user = ser.save()
-        VerificationService.send_verification_email(request,user)
+        base_url = request.build_absolute_uri("/")
+        send_verification_email.delay(user_id=user.id, base_url=base_url)
         return Response(
             {
                 "detail":"User registered successfully. Please verify your email.",
@@ -102,9 +104,11 @@ class ForgotPasswordView(APIView):
     def post(self,request,*args, **kwargs):
         ser = self.serializer_class(data=request.data)
         ser.is_valid(raise_exception=True)
+        base_url = request.build_absolute_uri("/")
         try:
             user = User.objects.get(email=ser.validated_data['email'])
-            VerificationService.send_verification_password_email(request,user)
+            print(user)
+            send_verification_password_email.delay(user_id=user.id,base_url=base_url)
         except Exception as e:
             pass
         return Response({"detail": "If this email exists, a reset link has been sent."})
@@ -140,6 +144,7 @@ class UserLoginView(TokenObtainPairView):
     # throttle_classes = [LoginBurstThrottle,LoginSustainedThrottle]
     serializer_class = RoleTokenObtainPairSerializer
     def post(self, request,*args,**kargs):
+        countnum.delay(10)
         res = super().post(request,*args,**kargs)
         refresh = res.data.pop("refresh",None)
         if refresh:

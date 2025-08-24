@@ -11,12 +11,18 @@ from apps.users.utils.email_templates import verification_email_template, passwo
 class VerificationService:
     
     @staticmethod
-    def send_verification_email(request,user):
+    def send_verification_email(user,base_url=None,request=None):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = EmailVerificationToken.create(user)
-        verify_url = request.build_absolute_uri(
-            reverse("verify_email",kwargs={"uidb64":uid,"token":token})
-        )
+        
+        if base_url:
+            verify_url = f"{base_url.rstrip('/')}{reverse('verify_email', kwargs={'uidb64': uid, 'token': token})}"
+            
+        if request:
+            verify_url = request.build_absolute_uri(
+                reverse("verify_email",kwargs={"uidb64":uid,"token":token})
+            )
+        
         
         text_content,html_content = verification_email_template(user,verify_url)
         EmailService.send_email(
@@ -28,12 +34,16 @@ class VerificationService:
         
         
     @staticmethod
-    def send_verification_password_email(request,user):
+    def send_verification_password_email(user,request=None,base_url=None):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = EmailVerificationToken.create(user)
-        reset_url = request.build_absolute_uri(
-            reverse("password_reset_confirm",kwargs={"uidb64":uid,"token":token})
-        )
+        if request:
+            reset_url = request.build_absolute_uri(
+                reverse("password_reset_confirm",kwargs={"uidb64":uid,"token":token})
+            )
+        if base_url:
+            reset_url=  f"{base_url.rstrip('/')}{reverse('verify_email', kwargs={'uidb64': uid, 'token': token})}"
+            
         text_content, html_content = password_reset_email_template(user, reset_url)
         EmailService.send_email(
             subject="Reset your Password",
