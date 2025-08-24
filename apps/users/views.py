@@ -144,7 +144,6 @@ class UserLoginView(TokenObtainPairView):
     # throttle_classes = [LoginBurstThrottle,LoginSustainedThrottle]
     serializer_class = RoleTokenObtainPairSerializer
     def post(self, request,*args,**kargs):
-        countnum.delay(10)
         res = super().post(request,*args,**kargs)
         refresh = res.data.pop("refresh",None)
         if refresh:
