@@ -25,10 +25,8 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/',include("apps.users.urls")),
-    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
+    path('api/v1/auth/',include("apps.users.urls")),
+    path('api/v1/menu/',include("apps.menu.urls")),
     path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
     
 ] + debug_toolbar_urls()

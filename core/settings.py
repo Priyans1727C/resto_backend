@@ -35,7 +35,9 @@ LOCAL_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    'apps.users'
+    'django_filters',
+    'apps.users',
+    "apps.menu"
 ]
 
 
@@ -146,6 +148,13 @@ REST_FRAMEWORK = {
     #
     #
     
+    # == PAGINATION ==
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    
+    # == DEFAULT_FILTER ==
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    
     # == Throttling ==
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',  
@@ -196,16 +205,16 @@ EMAIL_TOKEN_RESET_TIMEOUT= 120
 
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        # This location points to your Docker container
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         # This location points to your Docker container
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 
 INTERNAL_IPS = [
