@@ -4,19 +4,19 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from .models import (Restaurant,Category,MenuItem)
 from .serializers import (OnlyRestaurantSerializer,OnlyCategoriesSerializer,OnlyMenuItemSerializer,RestaurantItemsSeializer)
-from django.db import IntegrityError
-from django.db.models import Prefetch
 
-from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-# Create your views here.
 from .filters import ItemFilters
+
+from apps.users.permissions import IsStaffOrReadOnly
+
 
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = OnlyRestaurantSerializer
     lookup_field ="slug"
+    permission_classes = [IsStaffOrReadOnly]
     
 
 # class CategoryViewSet(viewsets.ModelViewSet):
@@ -33,6 +33,7 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = OnlyCategoriesSerializer
     lookup_field = "slug"
+    permission_classes = [IsStaffOrReadOnly]
     
     def get_queryset(self):
         resto_slug = self.kwargs.get("restaurant_slug")
@@ -46,6 +47,7 @@ class MenuItemViewSet(viewsets.ModelViewSet):
     filterset_class = ItemFilters
     # filterset_fields = ['category','price',]
     search_fields = ['name', 'description']
+    permission_classes = [IsStaffOrReadOnly]
     
     def get_queryset(self):
         category_slug = self.kwargs.get("categories_slug",None)
@@ -63,6 +65,7 @@ class RestaurantItemsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Restaurant.objects.all().prefetch_related("categories__items")
     serializer_class = RestaurantItemsSeializer
     lookup_field ="slug"
+    permission_classes = [IsStaffOrReadOnly]
     
     def get_queryset(self):
         return super().get_queryset()
