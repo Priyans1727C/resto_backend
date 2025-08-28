@@ -70,3 +70,9 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.menu_item.name}"
+    
+    @property
+    def item_name(self):
+        return self.menu_item.name
+    
+ 
