@@ -37,7 +37,8 @@ LOCAL_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     'django_filters',
     'apps.users',
-    "apps.menu"
+    "apps.menu",
+    "apps.orders"
 ]
 
 
