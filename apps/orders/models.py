@@ -31,7 +31,7 @@ class CartItem(models.Model):
 
     @property
     def total_price(self):
-        return (self.menu_item.price * self.quantity).quantize(Decimal("0.01"))
+        return (self.menu_item.price * self.quantity)
 
 
 class Order(models.Model):
