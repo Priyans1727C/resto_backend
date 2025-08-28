@@ -1,14 +1,19 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from . import views
+from rest_framework_nested.routers import NestedSimpleRouter
 
 router = DefaultRouter()
 router.register("cart",views.CartViewSet, basename="cart")
-router.register("cartItem",views.CartItemViewSet)
+
+cart_item = NestedSimpleRouter(router,r"cart",lookup="cart")
+cart_item.register(r"items",views.CartItemViewSet,basename="cart_items")
+
+router.register("cartItem",views.CartItemViewSet, basename="cart_item")
 router.register("getAllOrder",views.OrderViewSet)
 router.register("getAllOrderItem",views.OrderItemViewSet)
 
 urlpatterns = [
     path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
 
-]+router.urls
+]+router.urls+cart_item.urls

@@ -1,17 +1,18 @@
 from rest_framework import serializers
 from .models import (Cart, CartItem,Order,OrderItem)
 
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = ["id","user","created_at","updated_at"]
-        read_only_fields = ["id"]
-        
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ["id","cart","menu_item","item_name","quantity","item_price","total_price"]
         read_only_fields = ["id"]
+        
+        
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ["id","user","created_at","updated_at","cart_items"]
+        read_only_fields = ["id","cart_items"]
         
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
