@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from rest_framework import viewsets,mixins
+from rest_framework import viewsets,mixins,generics
+
 # Create your views here.
 from .models import (Cart, CartItem,Order,OrderItem)
-from .serializers import (CartSerializer,CartItemSerializer,OrderSerializer,OrderItemSerializer)
+from .serializers import (CartSerializer,CartItemSerializer,OrderSerializer,
+                          OrderItemSerializer, CreateOrderSerializer)
 
 from apps.users.permissions import IsStaffOrReadOnly, IsUser
 
@@ -25,16 +27,31 @@ class CartItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsUser]
     
     def get_queryset(self):
-        cart_id = self.kwargs.get("cart_pk",None)
-        return CartItem.objects.filter(cart = cart_id).select_related("cart","menu_item")
+        return CartItem.objects.select_related('menu_item','cart').filter(cart__user=self.request.user)
     
+    def perform_create(self, serializer):
+        cart, created = Cart.objects.get_or_create(user=self.request.user)
+        serializer.save(cart=cart)
+
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    # queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
     
     
 class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
+    
+
+class CreateOrderView(generics.CreateAPIView):
+    serializer_class = CreateOrderSerializer
+    permission_classes = [IsUser]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+    
     
