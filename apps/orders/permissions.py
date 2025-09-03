@@ -19,3 +19,15 @@ class IsStaff(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == "STAFF"
     
+class IsOwnerOrStaff(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.is_email_verified
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.role == "STAFF":
+            return True
+        if hasattr(obj,'user'):
+            return obj.user == request.user
+        elif hasattr(obj,'cart'):
+            return obj.cart.user == request.user
+        return False

@@ -26,9 +26,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'is_availabe', 'is_vegetarian')
-    list_editable = ('price', 'is_availabe')
-    list_filter = ('category', 'is_vegetarian', 'is_availabe')
+    list_display = ('name', 'category', 'price', 'is_available', 'is_vegetarian')
+    list_editable = ('price', 'is_available')
+    list_filter = ('category', 'is_vegetarian', 'is_available')
     search_fields = ('name', 'description')
     readonly_fields = ('slug',) # Make the slug field read-only since it's auto-generated
     fieldsets = (
@@ -36,7 +36,7 @@ class MenuItemAdmin(admin.ModelAdmin):
             'fields': ('category', 'name', 'slug', 'description')
         }),
         ('Pricing & Availability', {
-            'fields': ('price', 'is_availabe', 'is_vegetarian', 'serving_size')
+            'fields': ('price', 'is_available', 'is_vegetarian', 'serving_size')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),

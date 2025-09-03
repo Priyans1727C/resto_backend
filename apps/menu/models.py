@@ -64,7 +64,7 @@ class MenuItem(TimeStampedModel):
     is_vegetarian = models.BooleanField(default=True)
     
     price = models.DecimalField(max_digits=7,decimal_places=2)
-    is_availabe = models.BooleanField(default=True)
+    is_available = models.BooleanField(default=True)
     serving_size =models.CharField(max_length=100, blank=True, help_text="1/peice")
     
     class Meta:

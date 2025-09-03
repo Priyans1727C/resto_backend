@@ -31,7 +31,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_id', 'username', 'status', 'total_amount', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('order_id', 'user__username', 'user__email')
-    readonly_fields = ('order_id', 'user', 'username', 'total_amount', 'created_at', 'updated_at')
+    readonly_fields = ('order_id', 'username', 'total_amount', 'created_at', 'updated_at')
     fieldsets = (
         ('Order Information', {
             'fields': ('order_id', 'user', 'username', 'status', 'total_amount')

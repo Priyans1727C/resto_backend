@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/v1/auth/',include("apps.users.urls")),
     path('api/v1/menu/',include("apps.menu.urls")),
     path('api/v1/orders/',include("apps.orders.urls")),
+    path('api/v1/payments/',include("apps.payments.urls")),
     path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
     
 ] + debug_toolbar_urls()

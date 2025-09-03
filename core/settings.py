@@ -38,7 +38,8 @@ LOCAL_APPS = [
     'django_filters',
     'apps.users',
     "apps.menu",
-    "apps.orders"
+    "apps.orders",
+    "apps.payments"
 ]
 
 
