@@ -19,7 +19,6 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         order_id = attrs['order']
-        print(attrs)
         try:
             order = Order.objects.get(order_id=order_id)
         except Order.DoesNotExist:
