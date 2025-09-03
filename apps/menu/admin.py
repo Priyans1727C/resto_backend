@@ -30,7 +30,7 @@ class MenuItemAdmin(admin.ModelAdmin):
     list_editable = ('price', 'is_available')
     list_filter = ('category', 'is_vegetarian', 'is_available')
     search_fields = ('name', 'description')
-    readonly_fields = ('slug',) # Make the slug field read-only since it's auto-generated
+    readonly_fields = ('slug', 'created_at', 'updated_at') # Make the slug field read-only since it's auto-generated
     fieldsets = (
         (None, {
             'fields': ('category', 'name', 'slug', 'description')

@@ -33,7 +33,7 @@ class OnlyMenuItemSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = MenuItem
-        fields = ["category","name","slug","description","is_availabe","serving_size","price"]
+        fields = ["category","name","slug","description","is_available","serving_size","price"]
         read_only_fields = ["slug"]     
        
 class OnlyCategoriesSerializer(serializers.ModelSerializer):

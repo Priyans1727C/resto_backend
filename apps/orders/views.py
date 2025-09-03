@@ -7,6 +7,7 @@ from .serializers import (CartSerializer,CartItemSerializer,OrderSerializer,
                           OrderItemSerializer, CreateOrderSerializer, OrderWithItemSerializer)
 
 from .permissions import IsStaffOrReadOnly, IsUser , IsOwnerOrStaff
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 
 class SafeBaseViewSet(mixins.CreateModelMixin,mixins.RetrieveModelMixin,
@@ -48,6 +49,26 @@ class OrderViewSet(ListUpdateViewSet):
         if self.request.user.role == "STAFF":
             return Order.objects.all()
         return Order.objects.filter(user=self.request.user)
+    
+    def update(self,request,*args,**kwargs):
+        order = self.get_object()
+        if 'status' in request.data:
+            new_status = request.data['status']
+            
+        if request.user.role == "CUSTOMER":
+            if order.status != Order.OrderStatus.PENDING or new_status != Order.OrderStatus.CANCELLED:
+                raise PermissionDenied("You can only cancel pending orders")
+            
+        if request.user.role == "STAFF":
+            if order.status == Order.OrderStatus.COMPLETED or order.status == Order.OrderStatus.CANCELLED :
+                raise PermissionDenied("Cannot modefy completed or cancelled orders")
+            if order.status == Order.OrderStatus.PENDING and new_status not in [Order.OrderStatus.CANCELLED, Order.OrderStatus.CONFIRMED]:
+                raise PermissionDenied(f"Cannot modefy to {new_status} orders")
+            if order.status == Order.OrderStatus.CONFIRMED or order.status == Order.OrderStatus.PREPARING  and new_status not in [Order.OrderStatus.CANCELLED, Order.OrderStatus.PREPARING, Order.OrderStatus.ON_WAY]:
+                raise PermissionDenied(f"Cannot modefy to {new_status} orders")
+            if order.status == Order.OrderStatus.ON_WAY and new_status not in [Order.OrderStatus.CANCELLED, Order.OrderStatus.COMPLETED]:
+                raise PermissionDenied(f"Cannot modefy to {new_status} orders")
+        return super().update(request,*args,**kwargs)
     
 
     

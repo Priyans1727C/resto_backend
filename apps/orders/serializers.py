@@ -6,7 +6,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ["id","cart","menu_item","item_name","quantity","item_price","total_price"]
-        read_only_fields = ["id","cart"]
+        read_only_fields = ["id","cart","item_price","total_price"]
         
     def validate_quantity(self, value):
         if value<=0:
@@ -27,6 +27,7 @@ class CartItemSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Item already exists in the cart.")
         return attrs
         
+
         
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,6 +74,21 @@ class CreateOrderSerializer(serializers.ModelSerializer):
             if not cart_items:
                 raise serializers.ValidationError("Cart has no items")
             
+            
+            total = 0
+            for item in cart_items:
+                current_price = item.menu_item.price
+                if item.item_price != current_price:
+                    raise serializers.ValidationError(f"Price changed for {item.menu_item.name}. please refresh your cart.")
+                
+                if not item.menu_item.is_available:
+                    raise serializers.ValidationError(f"{item.menu_item.name} is no longer available for today ")
+                
+                total+=current_price* item.quantity
+            if abs(total - sum(item.total_price for item in cart_items)) >0.01:
+                raise serializers.ValidationError("Cart total is mismatch dectected")
+                
+                
             order = Order.objects.filter(user=user , status=Order.OrderStatus.PENDING).first()
             if order:
                 order.items.all().delete()

@@ -8,6 +8,12 @@ class CartItemInline(admin.TabularInline):
     raw_id_fields = ('menu_item',)
     extra = 1
 
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    fields = ('menu_item', 'quantity', 'item_name', 'item_price', 'total_price')
+    readonly_fields = ('item_name', 'item_price', 'total_price')
+
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     inlines = [CartItemInline]
@@ -31,7 +37,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_id', 'username', 'status', 'total_amount', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('order_id', 'user__username', 'user__email')
-    readonly_fields = ('order_id', 'username', 'total_amount', 'created_at', 'updated_at')
+    readonly_fields = ('order_id', 'username', 'created_at', 'updated_at')
     fieldsets = (
         ('Order Information', {
             'fields': ('order_id', 'user', 'username', 'status', 'total_amount')
