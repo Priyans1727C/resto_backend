@@ -2,6 +2,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,PermissionsMixin
 from django.db.models.functions import Lower
+from django.core.validators import FileExtensionValidator
 # Create your models here.
 
 class UserManager(BaseUserManager):
@@ -63,6 +64,10 @@ class User(AbstractBaseUser,PermissionsMixin):
     @property
     def is_customer(self): return self.role==self.Roles.CUSTOMER 
     
+    
+def profile_image_upload_to(instance,filename):
+    return f"profiles/{instance.user.email}-{filename}"
+    
 class UserProfile(models.Model):    
     user = models.OneToOneField(User,on_delete=models.CASCADE, to_field='email' ,primary_key=True, related_name="profile")
     first_name = models.CharField(max_length=50, blank=True)
@@ -70,6 +75,9 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)  
     address = models.TextField(max_length=500, blank=True)
     date_of_birth = models.DateField(blank=True, null=True)
+    image = models.ImageField(upload_to=profile_image_upload_to,blank=True,null=True,
+                              validators=[FileExtensionValidator(allowed_extensions=["jpg","jpeg","png","webp"])])
+    
 
     def __str__(self):
         return f"{self.first_name or self.user.email}'s Profile"

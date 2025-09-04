@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework import status
-from .serializers import UserSafeSerializer,UpdateUserSerializer,UserRegisterSerializer,RoleTokenObtainPairSerializer,UserChangePassword,UserEmailSerializer,ResetPasswordSerializer
+from .serializers import UserSafeSerializer,UpdateUserSerializer,UserRegisterSerializer,RoleTokenObtainPairSerializer,UserChangePassword,UserEmailSerializer,ResetPasswordSerializer,UserProfileSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 
 from django.contrib.auth import authenticate,login
+from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .auth import set_refresh_cookie,clear_refresh_cookie
@@ -16,12 +18,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.users.services.email_service import EmailService
 from apps.users.services.verification_service import VerificationService
 from django.utils.http import urlsafe_base64_decode
-
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .throttling import (LoginBurstThrottle, LoginSustainedThrottle)
 # Create your views here.
 from .tasks import send_verification_email,send_verification_password_email
 
 User = get_user_model()
+from .models import UserProfile
 
 
 class UserView(APIView):
@@ -36,19 +39,16 @@ class UserView(APIView):
         ser.save()
         return Response(ser.data)
     
-    # def patch(self, request):
-    #     # load user + profile in a single SELECT
-    #     user = User.objects.select_related("profile").get(pk=request.user.pk)
+class UserProfileViewSet(RetrieveUpdateAPIView):
+    throttle_scope = "user_profile"
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    #     ser = UpdateUserSerializer(user, data=request.data, partial=True, context={"request": request})
-    #     ser.is_valid(raise_exception=True)
-    #     ser.save()
-
-    #     # Because we updated the in-memory instance.profile above, serializer.data should NOT trigger extra SELECTs
-    #     return Response(ser.data)
-
+    def get_object(self):
+        profile, _ = UserProfile.objects.get_or_create(user=self.request.user)
+        return profile
     
-
 class UserRegisterView(APIView):
     throttle_scope = "register"
     def post(self,request):

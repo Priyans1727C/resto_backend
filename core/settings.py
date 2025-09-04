@@ -175,6 +175,7 @@ REST_FRAMEWORK = {
         "verify_reset_password":"3/hour",
         "login":"4/minute",
         # "login_sustained":"10/hour",
+        "user_profile":"10/minute",
     },
 }
 

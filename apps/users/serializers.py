@@ -8,11 +8,43 @@ from rest_framework.response import Response
 
 User = get_user_model()
 
+
 class UserProfileSerializer(serializers.ModelSerializer):
+    remove_image = serializers.BooleanField(write_only=True,required=False,default=False)
+    image = serializers.ImageField(required=False,allow_null=True,use_url =True)
     class Meta:
         model = UserProfile
-        fields = ["first_name", "last_name", "phone_number", "address", "date_of_birth"]
-
+        fields = ["user","first_name", "last_name", "phone_number", "address", "date_of_birth","image","remove_image"]
+        read_only_fields = ["user"]
+        
+    def validate_image(self,image):
+        if image:
+            MAX_PROFILE_IMAGE_SIZE = 2 * 1024 * 1024 
+            if image.size > MAX_PROFILE_IMAGE_SIZE:
+                raise serializers.ValidationError(f"Image size should be <= {MAX_PROFILE_IMAGE_SIZE // (1024*1024)} MB.")
+        return image
+    
+    @transaction.atomic
+    def update(self,instance, validated_data):
+        if validated_data.pop('remove_image',False):
+            if instance.image:
+                try:
+                    instance.image.delete(save=False)
+                except Exception:
+                    pass
+                
+            instance.image = None
+        
+        image = validated_data.get('image',serializers.empty)
+        if image is not serializers.empty:
+            instance.image = image
+        for attr,value in validated_data.items():
+            if attr !='image':
+                setattr(instance,attr,value)
+                
+        instance.save()
+        return instance
+    
 class UserSafeSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     class Meta:
