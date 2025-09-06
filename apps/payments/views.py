@@ -11,6 +11,11 @@ class CreatePayemntView(generics.CreateAPIView):
     permission_classes = [IsUser]
     
 class PaymentDetaildView(generics.ListAPIView):
-    queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    permission_classes = [IsUser]
+    def get_queryset(self):
+        if self.request.user.role == "STAFF":
+            return Payment.objects.all()
+        return Payment.objects.filter(order__user=self.request.user)
+       
     
