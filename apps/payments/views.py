@@ -3,6 +3,7 @@ from rest_framework import generics
 from .models import Payment
 from .serializers import PaymentSerializer
 from apps.users.permissions import IsUser
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
 
@@ -13,6 +14,8 @@ class CreatePayemntView(generics.CreateAPIView):
 class PaymentDetaildView(generics.ListAPIView):
     serializer_class = PaymentSerializer
     permission_classes = [IsUser]
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['status']
     def get_queryset(self):
         if self.request.user.role == "STAFF":
             return Payment.objects.all()

@@ -8,6 +8,8 @@ from .serializers import (CartSerializer,CartItemSerializer,OrderSerializer,
 
 from .permissions import IsStaffOrReadOnly, IsUser , IsOwnerOrStaff
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 
 class SafeBaseViewSet(mixins.CreateModelMixin,mixins.RetrieveModelMixin,
@@ -45,6 +47,8 @@ class CartItemViewSet(viewsets.ModelViewSet):
 class OrderViewSet(ListUpdateViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsOwnerOrStaff]
+    filter_backends =[DjangoFilterBackend]
+    filterset_fields = ['status']
     def get_queryset(self):
         if self.request.user.role == "STAFF":
             return Order.objects.all()
