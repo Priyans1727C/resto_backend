@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.core.validators import FileExtensionValidator
 
 # Create your models here.
 class TimeStampedModel(models.Model):
@@ -55,7 +56,9 @@ class Category(TimeStampedModel):
         return self.name
     
 
-
+def profile_image_upload_to(instance,filename):
+    return f"menuItems/{instance.slug}-{filename}"
+    
 class MenuItem(TimeStampedModel):
     category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name="items")
     name= models.CharField(max_length=200)
@@ -66,6 +69,8 @@ class MenuItem(TimeStampedModel):
     price = models.DecimalField(max_digits=7,decimal_places=2)
     is_available = models.BooleanField(default=True)
     serving_size =models.CharField(max_length=100, blank=True, help_text="1/peice")
+    image = models.ImageField(upload_to=profile_image_upload_to,blank=True,null=True,
+                              validators=[FileExtensionValidator(allowed_extensions=["jpg","jpeg","png","webp"])])
     
     class Meta:
         ordering = [ "category", "name"]

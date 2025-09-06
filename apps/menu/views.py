@@ -9,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from .filters import ItemFilters
 
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from apps.users.permissions import IsStaffOrReadOnly
 
 
@@ -42,6 +43,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class MenuItemViewSet(viewsets.ModelViewSet):
     serializer_class = OnlyMenuItemSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     lookup_field = "slug"
     filter_backends = [DjangoFilterBackend,filters.SearchFilter]
     filterset_class = ItemFilters
