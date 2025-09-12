@@ -10,7 +10,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ("Personal info", {"fields": ("full_name",)}),
-        ("Permissions", {"fields": ("is_active","is_staff","is_superuser","role")}),
+        ("Permissions", {"fields": ("is_active","is_email_verified","is_staff","is_superuser","role")}),
         ("Important dates", {"fields": ("last_login","date_joined")}),
     )
     add_fieldsets = ((None, {"classes": ("wide",), "fields": ("email","password1","password2")}),)

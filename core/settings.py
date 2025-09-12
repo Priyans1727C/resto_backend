@@ -26,6 +26,8 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     # Add packages like 'rest_framework' here
     # "django.contrib.staticfiles",
+    "daphne",
+    "channels",
     "debug_toolbar",
 ]
 
@@ -39,7 +41,8 @@ LOCAL_APPS = [
     'apps.users',
     "apps.menu",
     "apps.orders",
-    "apps.payments"
+    "apps.payments",
+    "apps.notifications",
 ]
 
 
@@ -58,6 +61,10 @@ DEFAULT_MIDDLEWARES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+THIRD_PARTY_MIDDLEWARES=[
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+]
+
 AUTH_MIDDLEWARES = [
     #debuger
     "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -65,7 +72,7 @@ AUTH_MIDDLEWARES = [
     "corsheaders.middleware.CorsMiddleware"
 ]
 
-MIDDLEWARE = DEFAULT_MIDDLEWARES+AUTH_MIDDLEWARES
+MIDDLEWARE = DEFAULT_MIDDLEWARES+AUTH_MIDDLEWARES+THIRD_PARTY_MIDDLEWARES
 
 
 ROOT_URLCONF = 'core.urls'
@@ -88,7 +95,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+# WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 # -------------------------
 # DATABASE
@@ -225,6 +233,16 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
+# -------------------------
+# CHANNELS
+# -------------------------
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 
 # -------------------------

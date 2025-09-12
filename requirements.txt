@@ -8,9 +8,9 @@ drf-nested-routers==0.94.2
 
 
 Pillow==11.3.0
-
-
-
+channels==4.3.1
+daphne==4.2.1
+whitenoise==6.10.0
 
 
 

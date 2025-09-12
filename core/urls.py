@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/v1/menu/',include("apps.menu.urls")),
     path('api/v1/orders/',include("apps.orders.urls")),
     path('api/v1/payments/',include("apps.payments.urls")),
+    path('api/v1/notifiy/',include("apps.notifications.urls")),
     path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
     
 ] + debug_toolbar_urls()+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
