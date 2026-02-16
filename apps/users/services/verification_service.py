@@ -42,7 +42,7 @@ class VerificationService:
                 reverse("password_reset_confirm",kwargs={"uidb64":uid,"token":token})
             )
         if base_url:
-            reset_url=  f"{base_url.rstrip('/')}{reverse('verify_email', kwargs={'uidb64': uid, 'token': token})}"
+            reset_url=  f"{base_url.rstrip('/')}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
             
         text_content, html_content = password_reset_email_template(user, reset_url)
         EmailService.send_email(

@@ -135,8 +135,18 @@ class ResetPasswordView(APIView):
 
 class AccessTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
-        request.data["refresh"] = request.COOKIES.get("refresh_token")
-        return super().post(request, *args, **kwargs)
+        refresh_token = request.COOKIES.get("refresh_token")
+        if not refresh_token:
+            return Response({"detail": "No refresh token provided."},status=status.HTTP_400_BAD_REQUEST)
+        data = request.data.copy()
+        data["refresh"] = refresh_token
+        serializer = self.get_serializer(data=data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return Response({"detail": "Invalid refresh token."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        # return super().post(request, *args, **kwargs)
 
 
 class UserLoginView(TokenObtainPairView):

@@ -56,7 +56,7 @@ class Category(TimeStampedModel):
         return self.name
     
 
-def profile_image_upload_to(instance,filename):
+def menu_image_upload_to(instance,filename):
     return f"menuItems/{instance.slug}-{filename}"
     
 class MenuItem(TimeStampedModel):
@@ -69,7 +69,7 @@ class MenuItem(TimeStampedModel):
     price = models.DecimalField(max_digits=7,decimal_places=2)
     is_available = models.BooleanField(default=True)
     serving_size =models.CharField(max_length=100, blank=True, help_text="1/peice")
-    image = models.ImageField(upload_to=profile_image_upload_to,blank=True,null=True,
+    image = models.ImageField(upload_to=menu_image_upload_to,blank=True,null=True,
                               validators=[FileExtensionValidator(allowed_extensions=["jpg","jpeg","png","webp"])])
     
     class Meta:

@@ -11,3 +11,4 @@ def set_refresh_cookie(response,refresh:str):
 
 def clear_refresh_cookie(response):
     response.delete_cookie("refresh_token",path="/api/v1/auth")
+    

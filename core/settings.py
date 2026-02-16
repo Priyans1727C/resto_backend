@@ -26,14 +26,15 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     # Add packages like 'rest_framework' here
     # "django.contrib.staticfiles",
-    "daphne",
+    # "daphne",
+    
     "channels",
     "debug_toolbar",
 ]
 
 LOCAL_APPS = [
     # Your own apps here
-    "corsheaders",
+    
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
@@ -67,9 +68,9 @@ THIRD_PARTY_MIDDLEWARES=[
 
 AUTH_MIDDLEWARES = [
     #debuger
+    "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     
-    "corsheaders.middleware.CorsMiddleware"
 ]
 
 MIDDLEWARE = DEFAULT_MIDDLEWARES+AUTH_MIDDLEWARES+THIRD_PARTY_MIDDLEWARES
@@ -177,13 +178,15 @@ REST_FRAMEWORK = {
         "burst":"200/min",
         "sustained":"500/day",
         "change_password":"10/hour",
-        "register":"6/hour",
+        # "register":"6/hour",
+        "register":"10/min",
         "verify_email":"2/hour",
         "forgot_password":"3/hour",
         "verify_reset_password":"3/hour",
         "login":"4/minute",
         # "login_sustained":"10/hour",
         "user_profile":"10/minute",
+        "resto_details":"8/minute",
     },
 }
 
@@ -234,6 +237,27 @@ INTERNAL_IPS = [
     # ...
 ]
 
+
+# -------------------------
+# CORS OPTIONS
+# -------------------------
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+# CORS_ALLOWED_ORIGINS = [
+    # "http://localhost:5173",
+#     "http://localhost:8080",
+#     "http://localhost:8000",
+# ]
+
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 # -------------------------
 # CHANNELS

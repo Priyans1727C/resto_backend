@@ -13,11 +13,16 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from apps.users.permissions import IsStaffOrReadOnly
 
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
+
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = OnlyRestaurantSerializer
     lookup_field ="slug"
     permission_classes = [IsStaffOrReadOnly]
+    throttle_scope = "resto_details"
     
 
 # class CategoryViewSet(viewsets.ModelViewSet):
@@ -35,6 +40,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = OnlyCategoriesSerializer
     lookup_field = "slug"
     permission_classes = [IsStaffOrReadOnly]
+    throttle_scope = "resto_details"
     
     def get_queryset(self):
         resto_slug = self.kwargs.get("restaurant_slug")
@@ -50,6 +56,7 @@ class MenuItemViewSet(viewsets.ModelViewSet):
     # filterset_fields = ['category','price',]
     search_fields = ['name', 'description']
     permission_classes = [IsStaffOrReadOnly]
+    throttle_scope = "resto_details"
     
     def get_queryset(self):
         category_slug = self.kwargs.get("categories_slug",None)
@@ -61,16 +68,25 @@ class MenuItemViewSet(viewsets.ModelViewSet):
             category__restaurant__slug=resto_slug
         ).select_related("category__restaurant")
         
+    @method_decorator(cache_page(60*60*2,key_prefix="menu_items"))
+    def list(self,*args,**kwargs):
+        return super().list(self,args,kwargs)
+        
         
     
 class RestaurantItemsViewSet(viewsets.ReadOnlyModelViewSet):
+    """It is for getting all the details of perticurar resto (inclide resto-name,category,items)"""
     queryset = Restaurant.objects.all().prefetch_related("categories__items")
     serializer_class = RestaurantItemsSeializer
     lookup_field ="slug"
     permission_classes = [IsStaffOrReadOnly]
-    
+    throttle_scope = "resto_details"
     def get_queryset(self):
         return super().get_queryset()
+    
+    @method_decorator(cache_page(60*60*20,key_prefix="resto_details"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 

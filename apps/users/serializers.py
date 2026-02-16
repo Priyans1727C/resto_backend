@@ -95,6 +95,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email","password")
+        
+    def validate_email(self, value):
+        # Use .only('id') to minimize DB load
+        if User.objects.only('id').filter(email__iexact=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+    
     def validate_password(self, value):
         validate_password(value);
         return value
