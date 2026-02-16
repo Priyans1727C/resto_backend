@@ -8,10 +8,9 @@ echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
 echo "Running migrations..."
-python manage.py migrate
+python manage.py migrate --no-input --run-syncdb
 
 echo "Creating superuser if not exists..."
-
 python manage.py shell << END
 import os
 from django.contrib.auth import get_user_model
