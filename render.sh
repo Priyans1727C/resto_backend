@@ -31,6 +31,3 @@ else:
 END
 
 echo "Build completed successfully!"
-
-echo "Developing ...."
-python manage.py runserver
