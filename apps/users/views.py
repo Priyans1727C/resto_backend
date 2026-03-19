@@ -20,11 +20,18 @@ from apps.users.services.verification_service import VerificationService
 from django.utils.http import urlsafe_base64_decode
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .throttling import (LoginBurstThrottle, LoginSustainedThrottle)
+
+from rest_framework import serializers as drf_serializers
+from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiResponse
 # Create your views here.
 from .tasks import send_verification_email,send_verification_password_email
 
 User = get_user_model()
 from .models import UserProfile
+
+
+class EmptySerializer(drf_serializers.Serializer):
+    pass
 
 
 class UserView(APIView):
@@ -45,12 +52,39 @@ class UserProfileViewSet(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
+    @extend_schema(tags=["auth"], summary="Get my profile")
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(tags=["auth"], summary="Update my profile")
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
+
+    @extend_schema(tags=["auth"], summary="Partially update my profile")
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
     def get_object(self):
         profile, _ = UserProfile.objects.get_or_create(user=self.request.user)
         return profile
     
 class UserRegisterView(APIView):
     throttle_scope = "register"
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Register a new user",
+        request=UserRegisterSerializer,
+        responses={
+            201: inline_serializer(
+                name="RegisterResponse",
+                fields={
+                    "detail": drf_serializers.CharField(),
+                    "user": UserSafeSerializer(),
+                },
+            )
+        },
+    )
     def post(self,request):
         ser = UserRegisterSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -69,6 +103,21 @@ class UserRegisterView(APIView):
 
 class VerifyEmailView(APIView):
     throttle_scope = "verify_email"
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Verify email address",
+        responses={
+            200: inline_serializer(
+                name="VerifyEmailResponse",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+            400: inline_serializer(
+                name="VerifyEmailError",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+        },
+    )
     def get(self,request,uidb64,token):
         try:
             uid = urlsafe_base64_decode(uidb64)
@@ -77,7 +126,7 @@ class VerifyEmailView(APIView):
             return Response({"detail":"Invalid or expired link"},status=status.HTTP_400_BAD_REQUEST)
 
         if VerificationService.activate_user(user,token):
-             return Response({"Email verified successfully!"})
+             return Response({"detail": "Email verified successfully!"})
         
         return Response({"detail":"Invalid or expired link"},status=status.HTTP_400_BAD_REQUEST)
 """
@@ -101,6 +150,18 @@ class UserLoginView(APIView):
 class ForgotPasswordView(APIView):
     throttle_scope = "forgot_password"
     serializer_class=UserEmailSerializer 
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Request password reset",
+        request=UserEmailSerializer,
+        responses={
+            200: inline_serializer(
+                name="ForgotPasswordResponse",
+                fields={"detail": drf_serializers.CharField()},
+            )
+        },
+    )
     def post(self,request,*args, **kwargs):
         ser = self.serializer_class(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -115,6 +176,22 @@ class ForgotPasswordView(APIView):
 
 class ResetPasswordView(APIView):
     throttle_scope = "verify_reset_password"
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Reset password",
+        request=ResetPasswordSerializer,
+        responses={
+            200: inline_serializer(
+                name="ResetPasswordResponse",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+            400: inline_serializer(
+                name="ResetPasswordError",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+        },
+    )
     def post(self,request,uidb64,token, **kwargs):
         ser = ResetPasswordSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -134,6 +211,25 @@ class ResetPasswordView(APIView):
         
 
 class AccessTokenRefreshView(TokenRefreshView):
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Refresh access token (uses refresh cookie)",
+        description="Reads `refresh_token` from cookies and returns a new access token.",
+        request=None,
+        responses={
+            200: OpenApiResponse(
+                response=inline_serializer(
+                    name="AccessTokenRefreshResponse",
+                    fields={"access": drf_serializers.CharField()},
+                )
+            ),
+            400: inline_serializer(
+                name="AccessTokenRefreshError",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+        },
+    )
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
         if not refresh_token:
@@ -153,6 +249,8 @@ class UserLoginView(TokenObtainPairView):
     throttle_scope ="login"
     # throttle_classes = [LoginBurstThrottle,LoginSustainedThrottle]
     serializer_class = RoleTokenObtainPairSerializer
+
+    @extend_schema(tags=["auth"], summary="Login")
     def post(self, request,*args,**kargs):
         res = super().post(request,*args,**kargs)
         refresh = res.data.pop("refresh",None)
@@ -163,6 +261,22 @@ class UserLoginView(TokenObtainPairView):
         
 class UserChangePasswordView(APIView):
     throttle_scope = "change_password"
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Change password",
+        request=UserChangePassword,
+        responses={
+            200: inline_serializer(
+                name="ChangePasswordResponse",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+            400: inline_serializer(
+                name="ChangePasswordError",
+                fields={"detail": drf_serializers.CharField()},
+            ),
+        },
+    )
     def post(self,request):
         ser = UserChangePassword(data = request.data)
         ser.is_valid(raise_exception=True)
@@ -176,6 +290,18 @@ class UserChangePasswordView(APIView):
 class UserLogoutView(APIView):
 
     permission_classes = [IsAuthenticated]
+    serializer_class = EmptySerializer
+
+    @extend_schema(
+        tags=["auth"],
+        summary="Logout",
+        responses={
+            200: inline_serializer(
+                name="LogoutResponse",
+                fields={"detail": drf_serializers.CharField()},
+            )
+        },
+    )
     def post(self,request):
         rt = request.COOKIES.get("refresh_token")
         if rt:
@@ -183,7 +309,7 @@ class UserLogoutView(APIView):
                 RefreshToken(rt).blacklist()
             except:
                 pass
-        res = Response({"Detail":"Logout Sucessfull"})
+        res = Response({"detail": "Logout successful"})
         clear_refresh_cookie(res)
         return res
                 

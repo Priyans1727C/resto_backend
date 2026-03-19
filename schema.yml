@@ -1,0 +1,2799 @@
+openapi: 3.0.3
+info:
+  title: RESTO BACKEND API
+  version: 1.0.0
+  description: Backend REST API for the restaurant platform.
+paths:
+  /api/v1/auth/change-password/:
+    post:
+      operationId: v1_auth_change_password_create
+      summary: Change password
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangePasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserChangePasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserChangePasswordRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePasswordResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePasswordError'
+          description: ''
+  /api/v1/auth/forgot-password/:
+    post:
+      operationId: v1_auth_forgot_password_create
+      summary: Request password reset
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEmailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserEmailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserEmailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPasswordResponse'
+          description: ''
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      summary: Login
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleTokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleTokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleTokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      summary: Logout
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+          description: ''
+  /api/v1/auth/me/:
+    get:
+      operationId: v1_auth_me_retrieve
+      summary: Get my profile
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: v1_auth_me_update
+      summary: Update my profile
+      tags:
+      - auth
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    patch:
+      operationId: v1_auth_me_partial_update
+      summary: Partially update my profile
+      tags:
+      - auth
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/v1/auth/refresh/:
+    post:
+      operationId: v1_auth_refresh_create
+      description: Reads `refresh_token` from cookies and returns a new access token.
+      summary: Refresh access token (uses refresh cookie)
+      tags:
+      - auth
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessTokenRefreshResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessTokenRefreshError'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: v1_auth_register_create
+      summary: Register a new user
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+          description: ''
+  /api/v1/auth/reset-password/{uidb64}/{token}/:
+    post:
+      operationId: v1_auth_reset_password_create
+      summary: Reset password
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: uidb64
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordError'
+          description: ''
+  /api/v1/auth/verify_email/{uidb64}/{token}/:
+    get:
+      operationId: v1_auth_verify_email_retrieve
+      summary: Verify email address
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: uidb64
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyEmailResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyEmailError'
+          description: ''
+  /api/v1/menu/getAllDetail/:
+    get:
+      operationId: v1_menu_getAllDetail_list
+      description: It is for getting all the details of perticurar resto (inclide
+        resto-name,category,items)
+      summary: List restaurants with categories & items
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRestaurantItemsSeializerList'
+          description: ''
+  /api/v1/menu/getAllDetail/{slug}/:
+    get:
+      operationId: v1_menu_getAllDetail_retrieve
+      description: It is for getting all the details of perticurar resto (inclide
+        resto-name,category,items)
+      summary: Get restaurant with categories & items
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantItemsSeializer'
+          description: ''
+  /api/v1/menu/menu-items/:
+    get:
+      operationId: v1_menu_menu_items_list
+      summary: List menu items
+      parameters:
+      - in: query
+        name: description
+        schema:
+          type: string
+      - in: query
+        name: description__contains
+        schema:
+          type: string
+      - in: query
+        name: name
+        schema:
+          type: string
+      - in: query
+        name: name__contains
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price__gt
+        schema:
+          type: number
+      - in: query
+        name: price__lt
+        schema:
+          type: number
+      - in: query
+        name: price__range
+        schema:
+          type: array
+          items:
+            type: number
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOnlyMenuItemList'
+          description: ''
+    post:
+      operationId: v1_menu_menu_items_create
+      summary: Create menu item
+      tags:
+      - menu
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+  /api/v1/menu/menu-items/{slug}/:
+    get:
+      operationId: v1_menu_menu_items_retrieve
+      summary: Get menu item
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+    put:
+      operationId: v1_menu_menu_items_update
+      summary: Update menu item
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+    patch:
+      operationId: v1_menu_menu_items_partial_update
+      summary: Partially update menu item
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyMenuItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyMenuItemRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyMenuItemRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+    delete:
+      operationId: v1_menu_menu_items_destroy
+      summary: Delete menu item
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/menu/restaurant/:
+    get:
+      operationId: v1_menu_restaurant_list
+      summary: List restaurants
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOnlyRestaurantList'
+          description: ''
+    post:
+      operationId: v1_menu_restaurant_create
+      summary: Create restaurant
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyRestaurantRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyRestaurantRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyRestaurantRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyRestaurant'
+          description: ''
+  /api/v1/menu/restaurant/{restaurant_slug}/categories/:
+    get:
+      operationId: v1_menu_restaurant_categories_list
+      summary: List categories (by restaurant)
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOnlyCategoriesList'
+          description: ''
+    post:
+      operationId: v1_menu_restaurant_categories_create
+      summary: Create category (by restaurant)
+      parameters:
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyCategoriesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyCategoriesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyCategoriesRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyCategories'
+          description: ''
+  /api/v1/menu/restaurant/{restaurant_slug}/categories/{categories_slug}/menu-items/:
+    get:
+      operationId: v1_menu_restaurant_categories_menu_items_list
+      summary: List menu items
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: description
+        schema:
+          type: string
+      - in: query
+        name: description__contains
+        schema:
+          type: string
+      - in: query
+        name: name
+        schema:
+          type: string
+      - in: query
+        name: name__contains
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: price__gt
+        schema:
+          type: number
+      - in: query
+        name: price__lt
+        schema:
+          type: number
+      - in: query
+        name: price__range
+        schema:
+          type: array
+          items:
+            type: number
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOnlyMenuItemList'
+          description: ''
+    post:
+      operationId: v1_menu_restaurant_categories_menu_items_create
+      summary: Create menu item
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+  /api/v1/menu/restaurant/{restaurant_slug}/categories/{categories_slug}/menu-items/{slug}/:
+    get:
+      operationId: v1_menu_restaurant_categories_menu_items_retrieve
+      summary: Get menu item
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+    put:
+      operationId: v1_menu_restaurant_categories_menu_items_update
+      summary: Update menu item
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyMenuItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+    patch:
+      operationId: v1_menu_restaurant_categories_menu_items_partial_update
+      summary: Partially update menu item
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyMenuItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyMenuItemRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyMenuItemRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyMenuItem'
+          description: ''
+    delete:
+      operationId: v1_menu_restaurant_categories_menu_items_destroy
+      summary: Delete menu item
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/menu/restaurant/{restaurant_slug}/categories/{slug}/:
+    get:
+      operationId: v1_menu_restaurant_categories_retrieve
+      summary: Get category (by restaurant)
+      parameters:
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyCategories'
+          description: ''
+    put:
+      operationId: v1_menu_restaurant_categories_update
+      summary: Update category (by restaurant)
+      parameters:
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyCategoriesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyCategoriesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyCategoriesRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyCategories'
+          description: ''
+    patch:
+      operationId: v1_menu_restaurant_categories_partial_update
+      summary: Partially update category (by restaurant)
+      parameters:
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyCategoriesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyCategoriesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyCategoriesRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyCategories'
+          description: ''
+    delete:
+      operationId: v1_menu_restaurant_categories_destroy
+      summary: Delete category (by restaurant)
+      parameters:
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/menu/restaurant/{slug}/:
+    get:
+      operationId: v1_menu_restaurant_retrieve
+      summary: Get restaurant
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyRestaurant'
+          description: ''
+    put:
+      operationId: v1_menu_restaurant_update
+      summary: Update restaurant
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnlyRestaurantRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OnlyRestaurantRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OnlyRestaurantRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyRestaurant'
+          description: ''
+    patch:
+      operationId: v1_menu_restaurant_partial_update
+      summary: Partially update restaurant
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyRestaurantRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyRestaurantRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOnlyRestaurantRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlyRestaurant'
+          description: ''
+    delete:
+      operationId: v1_menu_restaurant_destroy
+      summary: Delete restaurant
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - menu
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orders/cart/:
+    get:
+      operationId: v1_orders_cart_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCartList'
+          description: ''
+    post:
+      operationId: v1_orders_cart_create
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+  /api/v1/orders/cart/{cart_pk}/items/:
+    get:
+      operationId: v1_orders_cart_items_list
+      parameters:
+      - in: path
+        name: cart_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCartItemList'
+          description: ''
+    post:
+      operationId: v1_orders_cart_items_create
+      parameters:
+      - in: path
+        name: cart_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+  /api/v1/orders/cart/{cart_pk}/items/{id}/:
+    get:
+      operationId: v1_orders_cart_items_retrieve
+      parameters:
+      - in: path
+        name: cart_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+    put:
+      operationId: v1_orders_cart_items_update
+      parameters:
+      - in: path
+        name: cart_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+    patch:
+      operationId: v1_orders_cart_items_partial_update
+      parameters:
+      - in: path
+        name: cart_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+    delete:
+      operationId: v1_orders_cart_items_destroy
+      parameters:
+      - in: path
+        name: cart_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orders/cart/{id}/:
+    delete:
+      operationId: v1_orders_cart_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orders/cartItem/:
+    get:
+      operationId: v1_orders_cartItem_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCartItemList'
+          description: ''
+    post:
+      operationId: v1_orders_cartItem_create
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+  /api/v1/orders/cartItem/{id}/:
+    get:
+      operationId: v1_orders_cartItem_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+    put:
+      operationId: v1_orders_cartItem_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+    patch:
+      operationId: v1_orders_cartItem_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+    delete:
+      operationId: v1_orders_cartItem_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this cart item.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orders/create/:
+    post:
+      operationId: v1_orders_create_create
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrder'
+          description: ''
+  /api/v1/orders/getAllOrder/:
+    get:
+      operationId: v1_orders_getAllOrder_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - CANCELLED
+          - COMPLETED
+          - CONFIRMED
+          - ON_WAY
+          - PENDING
+          - PREPARING
+        description: |-
+          * `PENDING` - Pending
+          * `CONFIRMED` - Confirmed
+          * `PREPARING` - Preparing
+          * `ON_WAY` - On way
+          * `CANCELLED` - Cancelled
+          * `COMPLETED` - Completed
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderList'
+          description: ''
+  /api/v1/orders/getAllOrder/{id}/:
+    get:
+      operationId: v1_orders_getAllOrder_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    put:
+      operationId: v1_orders_getAllOrder_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    patch:
+      operationId: v1_orders_getAllOrder_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+    delete:
+      operationId: v1_orders_getAllOrder_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/orders/getAllOrderItem/:
+    get:
+      operationId: v1_orders_getAllOrderItem_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrderWithItemList'
+          description: ''
+  /api/v1/orders/getAllOrderItem/{id}/:
+    get:
+      operationId: v1_orders_getAllOrderItem_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderWithItem'
+          description: ''
+  /api/v1/payments/create/:
+    post:
+      operationId: v1_payments_create_create
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/v1/payments/getPayments/:
+    get:
+      operationId: v1_payments_getPayments_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - FAILED
+          - PENDING
+          - SUCCESS
+        description: |-
+          * `PENDING` - Pending
+          * `SUCCESS` - Success
+          * `FAILED` - Failed
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentList'
+          description: ''
+components:
+  schemas:
+    AccessTokenRefreshError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    AccessTokenRefreshResponse:
+      type: object
+      properties:
+        access:
+          type: string
+      required:
+      - access
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        cart_items:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+      required:
+      - cart_items
+      - created_at
+      - id
+      - updated_at
+      - user
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        cart:
+          type: string
+          format: uuid
+          readOnly: true
+        menu_item:
+          type: integer
+        item_name:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        item_price:
+          type: number
+          format: double
+          readOnly: true
+        total_price:
+          type: number
+          format: double
+          readOnly: true
+      required:
+      - cart
+      - id
+      - item_name
+      - item_price
+      - menu_item
+      - total_price
+    CartItemRequest:
+      type: object
+      properties:
+        menu_item:
+          type: integer
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - menu_item
+    CategoriesWithItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        slug:
+          type: string
+          maxLength: 150
+          pattern: ^[-a-zA-Z0-9_]+$
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnlyMenuItem'
+          readOnly: true
+      required:
+      - id
+      - items
+      - name
+    ChangePasswordError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    ChangePasswordResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    CreateOrder:
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status2e8Enum'
+          readOnly: true
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - order_id
+      - status
+      - total_amount
+    ForgotPasswordResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    LogoutResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    MethodEnum:
+      enum:
+      - COD
+      - ONLINE
+      type: string
+      description: |-
+        * `COD` - Cash On Delivery
+        * `ONLINE` - Online Payment
+    OnlyCategories:
+      type: object
+      properties:
+        restaurant:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        items:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+      required:
+      - items
+      - name
+      - restaurant
+      - slug
+    OnlyCategoriesRequest:
+      type: object
+      properties:
+        restaurant:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+      required:
+      - name
+      - restaurant
+    OnlyMenuItem:
+      type: object
+      properties:
+        category:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          maxLength: 270
+        is_available:
+          type: boolean
+        serving_size:
+          type: string
+          description: 1/peice
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        image:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - category
+      - name
+      - price
+      - slug
+    OnlyMenuItemRequest:
+      type: object
+      properties:
+        category:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 270
+        is_available:
+          type: boolean
+        serving_size:
+          type: string
+          description: 1/peice
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        image:
+          type: string
+          format: binary
+          nullable: true
+        remove_image:
+          type: boolean
+          writeOnly: true
+          default: false
+      required:
+      - category
+      - name
+      - price
+    OnlyRestaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        address:
+          type: string
+          maxLength: 260
+        description:
+          type: string
+          maxLength: 1000
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+      required:
+      - id
+      - name
+      - slug
+    OnlyRestaurantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        address:
+          type: string
+          maxLength: 260
+        description:
+          type: string
+          maxLength: 1000
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+      required:
+      - name
+    Order:
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          $ref: '#/components/schemas/Status2e8Enum'
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - order_id
+      - total_amount
+      - updated_at
+      - user
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        menu_item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - item_name
+      - menu_item
+      - price
+      - quantity
+    OrderRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status2e8Enum'
+    OrderWithItem:
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status2e8Enum'
+          readOnly: true
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          readOnly: true
+      required:
+      - items
+      - order_id
+      - status
+      - total_amount
+      - user
+    PaginatedCartItemList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+    PaginatedCartList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cart'
+    PaginatedOnlyCategoriesList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnlyCategories'
+    PaginatedOnlyMenuItemList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnlyMenuItem'
+    PaginatedOnlyRestaurantList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnlyRestaurant'
+    PaginatedOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+    PaginatedOrderWithItemList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderWithItem'
+    PaginatedPaymentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+    PaginatedRestaurantItemsSeializerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RestaurantItemsSeializer'
+    PatchedCartItemRequest:
+      type: object
+      properties:
+        menu_item:
+          type: integer
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+    PatchedOnlyCategoriesRequest:
+      type: object
+      properties:
+        restaurant:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+    PatchedOnlyMenuItemRequest:
+      type: object
+      properties:
+        category:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 270
+        is_available:
+          type: boolean
+        serving_size:
+          type: string
+          description: 1/peice
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        image:
+          type: string
+          format: binary
+          nullable: true
+        remove_image:
+          type: boolean
+          writeOnly: true
+          default: false
+    PatchedOnlyRestaurantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        address:
+          type: string
+          maxLength: 260
+        description:
+          type: string
+          maxLength: 1000
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+    PatchedOrderRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/Status2e8Enum'
+    PatchedUserProfileRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 15
+        address:
+          type: string
+          maxLength: 500
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        image:
+          type: string
+          format: binary
+          nullable: true
+        remove_image:
+          type: boolean
+          writeOnly: true
+          default: false
+    Payment:
+      type: object
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+          readOnly: true
+        method:
+          $ref: '#/components/schemas/MethodEnum'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - payment_id
+      - status
+    PaymentRequest:
+      type: object
+      properties:
+        order:
+          type: string
+          format: uuid
+          writeOnly: true
+        method:
+          $ref: '#/components/schemas/MethodEnum'
+      required:
+      - order
+    PaymentStatusEnum:
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `SUCCESS` - Success
+        * `FAILED` - Failed
+    RegisterResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserSafe'
+      required:
+      - detail
+      - user
+    ResetPasswordError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    ResetPasswordRequest:
+      type: object
+      properties:
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+    ResetPasswordResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    RestaurantItemsSeializer:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        slug:
+          type: string
+          maxLength: 160
+          pattern: ^[-a-zA-Z0-9_]+$
+        address:
+          type: string
+          maxLength: 260
+        description:
+          type: string
+          maxLength: 1000
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoriesWithItem'
+          readOnly: true
+      required:
+      - categories
+      - name
+    RoleEnum:
+      enum:
+      - ADMIN
+      - STAFF
+      - CUSTOMER
+      type: string
+      description: |-
+        * `ADMIN` - Admin
+        * `STAFF` - Staff
+        * `CUSTOMER` - Customer
+    RoleTokenObtainPairRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    Status2e8Enum:
+      enum:
+      - PENDING
+      - CONFIRMED
+      - PREPARING
+      - ON_WAY
+      - CANCELLED
+      - COMPLETED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `CONFIRMED` - Confirmed
+        * `PREPARING` - Preparing
+        * `ON_WAY` - On way
+        * `CANCELLED` - Cancelled
+        * `COMPLETED` - Completed
+    UserChangePasswordRequest:
+      type: object
+      properties:
+        old_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+      - old_password
+    UserEmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    UserProfile:
+      type: object
+      properties:
+        user:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 15
+        address:
+          type: string
+          maxLength: 500
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        image:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - user
+    UserProfileRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        phone_number:
+          type: string
+          nullable: true
+          maxLength: 15
+        address:
+          type: string
+          maxLength: 500
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        image:
+          type: string
+          format: binary
+          nullable: true
+        remove_image:
+          type: boolean
+          writeOnly: true
+          default: false
+    UserRegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+      required:
+      - email
+      - password
+    UserSafe:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        full_name:
+          type: string
+          maxLength: 150
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        is_email_verified:
+          type: boolean
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/UserProfile'
+          readOnly: true
+      required:
+      - date_joined
+      - email
+      - id
+      - is_email_verified
+      - last_login
+      - profile
+      - role
+    VerifyEmailError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    VerifyEmailResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: auth
+  description: Authentication & account management.
+- name: menu
+  description: Restaurants, categories, and menu items.
+- name: orders
+  description: Carts and orders.
+- name: payments
+  description: Payment flows.
+- name: notifiy
+  description: Notifications.

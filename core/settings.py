@@ -30,6 +30,8 @@ THIRD_PARTY_APPS = [
     
     "channels",
     "debug_toolbar",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
 ]
 
 LOCAL_APPS = [
@@ -194,6 +196,10 @@ REST_FRAMEWORK = {
         "user_profile":"10/minute",
         "resto_details":"8/minute",
     },
+    
+    
+    # API DOCS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -282,3 +288,48 @@ CHANNEL_LAYERS = {
 # -------------------------
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://127.0.0.1:6379/1")
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://127.0.0.1:6379/1")
+
+
+
+# -------------------------
+# SPECTACULAR_SETTINGS
+# -------------------------
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'RESTO BACKEND API',
+    'DESCRIPTION': 'Backend REST API for the restaurant platform.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+
+    # Better component generation
+    'COMPONENT_SPLIT_REQUEST': True,
+
+    # Tag organization in Swagger UI
+    'TAGS': [
+        {'name': 'auth', 'description': 'Authentication & account management.'},
+        {'name': 'menu', 'description': 'Restaurants, categories, and menu items.'},
+        {'name': 'orders', 'description': 'Carts and orders.'},
+        {'name': 'payments', 'description': 'Payment flows.'},
+        {'name': 'notifiy', 'description': 'Notifications.'},
+    ],
+
+    # Swagger UI polish
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'displayRequestDuration': True,
+        'persistAuthorization': True,
+        'docExpansion': 'none',
+        'defaultModelsExpandDepth': -1,
+        'defaultModelExpandDepth': 2,
+        'filter': True,
+        'tryItOutEnabled': True,
+    },
+
+    # Misc
+    'SORT_OPERATIONS': True,
+    'SORT_OPERATION_PARAMETERS': True,
+
+    # OTHER SETTINGS
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}

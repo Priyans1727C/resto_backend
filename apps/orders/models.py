@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from apps.menu.models import MenuItem
 import uuid
+from decimal import Decimal
 
 User = get_user_model()
 
@@ -23,15 +24,15 @@ class CartItem(models.Model):
         unique_together = ("cart", "menu_item")
 
     @property
-    def item_name(self):
+    def item_name(self) -> str:
         return self.menu_item.name
 
     @property
-    def item_price(self):
+    def item_price(self) -> Decimal:
         return self.menu_item.price
 
     @property
-    def total_price(self):
+    def total_price(self) -> Decimal:
         return (self.menu_item.price * self.quantity)
 
 
@@ -73,7 +74,7 @@ class OrderItem(models.Model):
         return f"{self.menu_item.name}"
     
     @property
-    def item_name(self):
+    def item_name(self) -> str:
         return self.menu_item.name
     
  

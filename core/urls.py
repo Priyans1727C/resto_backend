@@ -25,6 +25,8 @@ from rest_framework_simplejwt.views import (
 
 from debug_toolbar.toolbar import debug_toolbar_urls
 
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +36,12 @@ urlpatterns = [
     path('api/v1/payments/',include("apps.payments.urls")),
     path('api/v1/notifiy/',include("apps.notifications.urls")),
     path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
+    
+    
+    
+        # API schema + docs
+        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
 ] + debug_toolbar_urls()+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

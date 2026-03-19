@@ -17,6 +17,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
+@extend_schema(tags=["menu"])
+@extend_schema_view(
+    list=extend_schema(summary="List restaurants"),
+    retrieve=extend_schema(summary="Get restaurant"),
+    create=extend_schema(summary="Create restaurant"),
+    update=extend_schema(summary="Update restaurant"),
+    partial_update=extend_schema(summary="Partially update restaurant"),
+    destroy=extend_schema(summary="Delete restaurant"),
+)
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = OnlyRestaurantSerializer
@@ -36,6 +47,15 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 #     lookup_field = "slug"
     
 
+@extend_schema(tags=["menu"])
+@extend_schema_view(
+    list=extend_schema(summary="List categories (by restaurant)"),
+    retrieve=extend_schema(summary="Get category (by restaurant)"),
+    create=extend_schema(summary="Create category (by restaurant)"),
+    update=extend_schema(summary="Update category (by restaurant)"),
+    partial_update=extend_schema(summary="Partially update category (by restaurant)"),
+    destroy=extend_schema(summary="Delete category (by restaurant)"),
+)
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = OnlyCategoriesSerializer
     lookup_field = "slug"
@@ -47,6 +67,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Category.objects.filter(restaurant__slug = resto_slug).prefetch_related("items")
        
 
+@extend_schema(tags=["menu"])
+@extend_schema_view(
+    list=extend_schema(summary="List menu items"),
+    retrieve=extend_schema(summary="Get menu item"),
+    create=extend_schema(summary="Create menu item"),
+    update=extend_schema(summary="Update menu item"),
+    partial_update=extend_schema(summary="Partially update menu item"),
+    destroy=extend_schema(summary="Delete menu item"),
+)
 class MenuItemViewSet(viewsets.ModelViewSet):
     serializer_class = OnlyMenuItemSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -68,12 +97,17 @@ class MenuItemViewSet(viewsets.ModelViewSet):
             category__restaurant__slug=resto_slug
         ).select_related("category__restaurant")
         
-    @method_decorator(cache_page(60*60*2,key_prefix="menu_items"))
-    def list(self,*args,**kwargs):
-        return super().list(self,args,kwargs)
+    @method_decorator(cache_page(60*60*2, key_prefix="menu_items"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
         
         
     
+@extend_schema(tags=["menu"])
+@extend_schema_view(
+    list=extend_schema(summary="List restaurants with categories & items"),
+    retrieve=extend_schema(summary="Get restaurant with categories & items"),
+)
 class RestaurantItemsViewSet(viewsets.ReadOnlyModelViewSet):
     """It is for getting all the details of perticurar resto (inclide resto-name,category,items)"""
     queryset = Restaurant.objects.all().prefetch_related("categories__items")

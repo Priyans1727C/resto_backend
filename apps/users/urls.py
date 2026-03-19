@@ -12,7 +12,7 @@ urlpatterns = [
     path("logout/", UserLogoutView.as_view(), name="logout"),
     path("verify_email/<str:uidb64>/<str:token>/",VerifyEmailView.as_view(),name="verify_email"),
     path("forgot-password/", ForgotPasswordView.as_view(), name="forgot_password"),
-    path("reset-password/<uidb64>/<token>/", ResetPasswordView.as_view(), name="password_reset_confirm"),
+    path("reset-password/<str:uidb64>/<str:token>/", ResetPasswordView.as_view(), name="password_reset_confirm"),
     
    path("healthz/", lambda r: __import__("django.http").http.JsonResponse({"ok": True})),
 ]

@@ -15,7 +15,7 @@ category_routes.register(r'categories', views.CategoryViewSet, basename='restaur
 
 #Level 3: MenuItem under Categories
 menuItem_routes = NestedSimpleRouter(category_routes,r'categories',lookup='categories')
-menuItem_routes.register(r'menu-items',views.MenuItemViewSet,basename="category-menu-items")
+menuItem_routes.register(r'menu-items',views.MenuItemViewSet,basename="restaurant-category-menu-items")
 
 
 # getAll = NestedSimpleRouter(router, r'', lookup='restaurant')

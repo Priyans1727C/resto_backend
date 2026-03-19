@@ -10,6 +10,8 @@ from .permissions import IsStaffOrReadOnly, IsUser , IsOwnerOrStaff
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 
+from drf_spectacular.utils import extend_schema
+
 
 
 class SafeBaseViewSet(mixins.CreateModelMixin,mixins.RetrieveModelMixin,
@@ -22,21 +24,27 @@ class CreateAndDistroyViewSet(mixins.CreateModelMixin,mixins.ListModelMixin,mixi
 class ListUpdateViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin,viewsets.GenericViewSet):
     pass
 
+@extend_schema(tags=["orders"])
 class CartViewSet(CreateAndDistroyViewSet):
     serializer_class = CartSerializer
     permission_classes = [IsOwnerOrStaff]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Cart.objects.none()
         return Cart.objects.filter(user=self.request.user).prefetch_related('cart_items')
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
 
 
+@extend_schema(tags=["orders"])
 class CartItemViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [IsOwnerOrStaff]
     
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return CartItem.objects.none()
         return CartItem.objects.select_related('menu_item','cart').filter(cart__user=self.request.user)
     
     def perform_create(self, serializer):
@@ -44,12 +52,17 @@ class CartItemViewSet(viewsets.ModelViewSet):
         serializer.save(cart=cart)
 
 
+@extend_schema(tags=["orders"])
 class OrderViewSet(ListUpdateViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsOwnerOrStaff]
+    lookup_field = "order_id"
+    lookup_url_kwarg = "id"
     filter_backends =[DjangoFilterBackend]
     filterset_fields = ['status']
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
         if self.request.user.role == "STAFF":
             return Order.objects.all()
         return Order.objects.filter(user=self.request.user)
@@ -76,10 +89,15 @@ class OrderViewSet(ListUpdateViewSet):
     
 
     
+@extend_schema(tags=["orders"])
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderWithItemSerializer
     permission_classes = [IsOwnerOrStaff]
+    lookup_field = "order_id"
+    lookup_url_kwarg = "id"
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
         if self.request.user.role == "STAFF":
             return Order.objects.all().prefetch_related("items__menu_item")
 
