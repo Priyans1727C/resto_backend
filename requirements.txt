@@ -73,3 +73,10 @@ vine==5.1.0
 wcwidth==0.2.13
 whitenoise==6.10.0
 zope.interface==7.2
+
+# --- Deployment additions ---
+gunicorn==22.0.0
+uvicorn==0.30.0
+httptools==0.7.1
+websockets==16.0
+h11==0.16.0
