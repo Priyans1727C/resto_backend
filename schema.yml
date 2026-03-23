@@ -348,6 +348,12 @@ paths:
       operationId: v1_menu_menu_items_list
       summary: List menu items
       parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        description: Category slug (only present on nested routes).
+        required: true
       - in: query
         name: description
         schema:
@@ -387,6 +393,12 @@ paths:
         description: Multiple values may be separated by commas.
         explode: false
         style: form
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        description: Restaurant slug (only present on nested routes).
+        required: true
       - name: search
         required: false
         in: query
@@ -407,6 +419,19 @@ paths:
     post:
       operationId: v1_menu_menu_items_create
       summary: Create menu item
+      parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        description: Category slug (only present on nested routes).
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        description: Restaurant slug (only present on nested routes).
+        required: true
       tags:
       - menu
       requestBody:
@@ -436,6 +461,18 @@ paths:
       summary: Get menu item
       parameters:
       - in: path
+        name: categories_slug
+        schema:
+          type: string
+        description: Category slug (only present on nested routes).
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        description: Restaurant slug (only present on nested routes).
+        required: true
+      - in: path
         name: slug
         schema:
           type: string
@@ -455,6 +492,18 @@ paths:
       operationId: v1_menu_menu_items_update
       summary: Update menu item
       parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        description: Category slug (only present on nested routes).
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        description: Restaurant slug (only present on nested routes).
+        required: true
       - in: path
         name: slug
         schema:
@@ -488,6 +537,18 @@ paths:
       summary: Partially update menu item
       parameters:
       - in: path
+        name: categories_slug
+        schema:
+          type: string
+        description: Category slug (only present on nested routes).
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        description: Restaurant slug (only present on nested routes).
+        required: true
+      - in: path
         name: slug
         schema:
           type: string
@@ -518,6 +579,18 @@ paths:
       operationId: v1_menu_menu_items_destroy
       summary: Delete menu item
       parameters:
+      - in: path
+        name: categories_slug
+        schema:
+          type: string
+        description: Category slug (only present on nested routes).
+        required: true
+      - in: path
+        name: restaurant_slug
+        schema:
+          type: string
+        description: Restaurant slug (only present on nested routes).
+        required: true
       - in: path
         name: slug
         schema:
@@ -593,6 +666,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       tags:
       - menu
@@ -613,6 +687,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       tags:
       - menu
@@ -646,6 +721,7 @@ paths:
         name: categories_slug
         schema:
           type: string
+        description: Category slug (only present on nested routes).
         required: true
       - in: query
         name: description
@@ -690,6 +766,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - name: search
         required: false
@@ -716,11 +793,13 @@ paths:
         name: categories_slug
         schema:
           type: string
+        description: Category slug (only present on nested routes).
         required: true
       - in: path
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       tags:
       - menu
@@ -754,11 +833,13 @@ paths:
         name: categories_slug
         schema:
           type: string
+        description: Category slug (only present on nested routes).
         required: true
       - in: path
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -784,11 +865,13 @@ paths:
         name: categories_slug
         schema:
           type: string
+        description: Category slug (only present on nested routes).
         required: true
       - in: path
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -826,11 +909,13 @@ paths:
         name: categories_slug
         schema:
           type: string
+        description: Category slug (only present on nested routes).
         required: true
       - in: path
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -867,11 +952,13 @@ paths:
         name: categories_slug
         schema:
           type: string
+        description: Category slug (only present on nested routes).
         required: true
       - in: path
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -894,6 +981,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -919,6 +1007,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -956,6 +1045,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -992,6 +1082,7 @@ paths:
         name: restaurant_slug
         schema:
           type: string
+        description: Restaurant slug (only present on nested routes).
         required: true
       - in: path
         name: slug
@@ -1891,7 +1982,7 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/Status2e8Enum'
+          - $ref: '#/components/schemas/OrderStatusEnum'
           readOnly: true
         total_amount:
           type: string
@@ -2091,7 +2182,7 @@ components:
           readOnly: true
           nullable: true
         status:
-          $ref: '#/components/schemas/Status2e8Enum'
+          $ref: '#/components/schemas/OrderStatusEnum'
         total_amount:
           type: string
           format: decimal
@@ -2141,7 +2232,23 @@ components:
       type: object
       properties:
         status:
-          $ref: '#/components/schemas/Status2e8Enum'
+          $ref: '#/components/schemas/OrderStatusEnum'
+    OrderStatusEnum:
+      enum:
+      - PENDING
+      - CONFIRMED
+      - PREPARING
+      - ON_WAY
+      - CANCELLED
+      - COMPLETED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `CONFIRMED` - Confirmed
+        * `PREPARING` - Preparing
+        * `ON_WAY` - On way
+        * `CANCELLED` - Cancelled
+        * `COMPLETED` - Completed
     OrderWithItem:
       type: object
       properties:
@@ -2155,7 +2262,7 @@ components:
           nullable: true
         status:
           allOf:
-          - $ref: '#/components/schemas/Status2e8Enum'
+          - $ref: '#/components/schemas/OrderStatusEnum'
           readOnly: true
         total_amount:
           type: string
@@ -2451,7 +2558,7 @@ components:
       type: object
       properties:
         status:
-          $ref: '#/components/schemas/Status2e8Enum'
+          $ref: '#/components/schemas/OrderStatusEnum'
     PatchedUserProfileRequest:
       type: object
       properties:
@@ -2614,22 +2721,6 @@ components:
       required:
       - email
       - password
-    Status2e8Enum:
-      enum:
-      - PENDING
-      - CONFIRMED
-      - PREPARING
-      - ON_WAY
-      - CANCELLED
-      - COMPLETED
-      type: string
-      description: |-
-        * `PENDING` - Pending
-        * `CONFIRMED` - Confirmed
-        * `PREPARING` - Preparing
-        * `ON_WAY` - On way
-        * `CANCELLED` - Cancelled
-        * `COMPLETED` - Completed
     UserChangePasswordRequest:
       type: object
       properties:

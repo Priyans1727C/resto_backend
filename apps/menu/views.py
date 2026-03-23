@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 
 @extend_schema(tags=["menu"])
 @extend_schema_view(
@@ -47,7 +47,18 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 #     lookup_field = "slug"
     
 
-@extend_schema(tags=["menu"])
+@extend_schema(
+    tags=["menu"],
+    parameters=[
+        OpenApiParameter(
+            name="restaurant_slug",
+            type=str,
+            location=OpenApiParameter.PATH,
+            required=False,
+            description="Restaurant slug (only present on nested routes).",
+        ),
+    ],
+)
 @extend_schema_view(
     list=extend_schema(summary="List categories (by restaurant)"),
     retrieve=extend_schema(summary="Get category (by restaurant)"),
@@ -67,7 +78,25 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Category.objects.filter(restaurant__slug = resto_slug).prefetch_related("items")
        
 
-@extend_schema(tags=["menu"])
+@extend_schema(
+    tags=["menu"],
+    parameters=[
+        OpenApiParameter(
+            name="restaurant_slug",
+            type=str,
+            location=OpenApiParameter.PATH,
+            required=False,
+            description="Restaurant slug (only present on nested routes).",
+        ),
+        OpenApiParameter(
+            name="categories_slug",
+            type=str,
+            location=OpenApiParameter.PATH,
+            required=False,
+            description="Category slug (only present on nested routes).",
+        ),
+    ],
+)
 @extend_schema_view(
     list=extend_schema(summary="List menu items"),
     retrieve=extend_schema(summary="Get menu item"),

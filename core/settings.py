@@ -328,6 +328,23 @@ SPECTACULAR_SETTINGS = {
     'SORT_OPERATIONS': True,
     'SORT_OPERATION_PARAMETERS': True,
 
+    # Avoid enum name collisions (e.g. multiple different "status" choice sets)
+    'ENUM_NAME_OVERRIDES': {
+        'OrderStatusEnum': (
+            ('PENDING', 'Pending'),
+            ('CONFIRMED', 'Confirmed'),
+            ('PREPARING', 'Preparing'),
+            ('ON_WAY', 'On way'),
+            ('CANCELLED', 'Cancelled'),
+            ('COMPLETED', 'Completed'),
+        ),
+        'PaymentStatusEnum': (
+            ('PENDING', 'Pending'),
+            ('SUCCESS', 'Success'),
+            ('FAILED', 'Failed'),
+        ),
+    },
+
     # OTHER SETTINGS
     'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
