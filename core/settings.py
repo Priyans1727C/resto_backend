@@ -104,12 +104,23 @@ ASGI_APPLICATION = 'core.asgi.application'
 # -------------------------
 # DATABASE
 # -------------------------
+DB_ENGINE = config('DB_ENGINE', default='django.db.backends.sqlite3')
+DB_NAME = config('DB_NAME', default='db.sqlite3')
+
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
-        'NAME': BASE_DIR / config('DB_NAME', default='db.sqlite3'),
+        'ENGINE': DB_ENGINE,
+        'NAME': str(BASE_DIR / DB_NAME) if DB_ENGINE == 'django.db.backends.sqlite3' else DB_NAME,
     }
 }
+
+if DB_ENGINE != 'django.db.backends.sqlite3':
+    DATABASES['default'].update({
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default='postgres'),
+        'HOST': config('DB_HOST', default='127.0.0.1'),
+        'PORT': config('DB_PORT', default='5432'),
+    })
 
 # -------------------------
 # PASSWORDS
@@ -286,10 +297,16 @@ CHANNEL_LAYERS = {
 # -------------------------
 # CELERY
 # -------------------------
+import ssl
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://127.0.0.1:6379/1")
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://127.0.0.1:6379/1")
+CELERY_BROKER_USE_SSL = {
+    "ssl_cert_reqs": ssl.CERT_NONE
+}
 
-
+CELERY_REDIS_BACKEND_USE_SSL = {
+    "ssl_cert_reqs": ssl.CERT_NONE
+}
 
 # -------------------------
 # SPECTACULAR_SETTINGS
