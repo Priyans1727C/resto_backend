@@ -300,13 +300,13 @@ CHANNEL_LAYERS = {
 import ssl
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://127.0.0.1:6379/1")
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://127.0.0.1:6379/1")
-CELERY_BROKER_USE_SSL = {
-    "ssl_cert_reqs": ssl.CERT_NONE
-}
+# CELERY_BROKER_USE_SSL = {
+#     "ssl_cert_reqs": ssl.CERT_NONE
+# }
 
-CELERY_REDIS_BACKEND_USE_SSL = {
-    "ssl_cert_reqs": ssl.CERT_NONE
-}
+# CELERY_REDIS_BACKEND_USE_SSL = {
+#     "ssl_cert_reqs": ssl.CERT_NONE
+# }
 
 # -------------------------
 # SPECTACULAR_SETTINGS
