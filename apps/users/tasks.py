@@ -27,3 +27,9 @@ def send_verification_password_email(self,user_id,base_url):
         return f"user with{user_id} doesn't exist"
     except Exception as exce:
         raise self.retry(exce=exce)
+    
+    
+@shared_task
+def test_task():
+    print("✅ Celery is working!")
+    return "Done"
